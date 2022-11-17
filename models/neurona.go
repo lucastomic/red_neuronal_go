@@ -7,8 +7,10 @@ type Neurona struct {
 	Entradas []float64
 	// Úlitma salida calculada de la neurona
 	Salida float64
-	// Pesos de todas las conexiones de la nerurona. El 0 es el bias
+	// Pesos de todas las conexiones ENTRANTES de la nerurona. El 0 es el bias
 	Pesos []float64
+	// Sigma de la neurona
+	Sigma float64
 }
 
 // Calcula la salída de la neurona aplicando la función de activación
@@ -33,10 +35,4 @@ func (p *Neurona) caclularNeta() float64 {
 		res += p.Entradas[i] * p.Pesos[i]
 	}
 	return res
-}
-
-// Calcular δ  de la neurona. Tiene que haber sido actualizada la salida previamente
-func (n *Neurona) GetSigma(deseada float64) float64 {
-	sigma := (deseada - n.Salida) * n.Salida * (1 - n.Salida)
-	return sigma
 }

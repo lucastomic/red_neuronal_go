@@ -39,11 +39,17 @@ var entradas []float64 = []float64{
 func main() {
 	red := models.RedNeuronal{
 		NeuronasPorCapa: []int{2, 1},
-		Pesos:           pesos,
+		PesosIniciales:  pesos,
 		Entradas:        entradas,
+		CAprendizaje:    0.267981990706176,
+		SalidasDeseadas: []float64{0.26584673137404},
 	}
 	red.InitPerceptrones()
-	red.Propagar()
-	fmt.Println(red.ObtenerSalida())
+
+	for i := 0; i < 1000; i++ {
+		red.Propagar()
+		fmt.Println(red.ObtenerSalida())
+		red.Retropropagar()
+	}
 
 }

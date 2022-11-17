@@ -6,12 +6,14 @@ type RedNeuronal struct {
 	NeuronasPorCapa []int
 	// Entradas de la red neuronal. La primera es el bias.
 	Entradas []float64
-	// Los pesos de cada una de las conexiones. En la siguiente estructura:
+	// Los pesos iniciales de cada una de las conexiones. En la siguiente estructura:
 	// [nº de capa][nº de neurona de dicha capa][cada conexión de dicha neurona]
-	// Pesos debe tener length de [len(numeroCapas)] [numeroCapas[i]] [numeroCapas[i-1]]
-	Pesos [][][]float64
+	// PesosIniciales debe tener length de [len(numeroCapas)] [numeroCapas[i]] [numeroCapas[i-1]]
+	PesosIniciales [][][]float64
 	// Coeficiente de aprendizaje de la red neuronal
 	CAprendizaje float64
+	// Vector de salidas deseadas
+	SalidasDeseadas []float64
 }
 
 // Neuronas del perceptron. La estructura es la siguiente:
@@ -40,7 +42,7 @@ func (r *RedNeuronal) InitPerceptrones() {
 			}
 
 			neuronas[i][j] = &Neurona{
-				Pesos:    r.Pesos[i][j],
+				Pesos:    r.PesosIniciales[i][j],
 				Entradas: make([]float64, numEntradas),
 			}
 
@@ -64,6 +66,7 @@ func (r *RedNeuronal) Propagar() {
 
 	r.inicializarEntradasPrimeraCapa()
 
+	// Translada la salida de las neuronas de la capa k a las entradas de las neuronas de la capa k+1
 	for i := 1; i < len(r.NeuronasPorCapa); i++ { // i es el nº de capa. Comienza en 1 porque las entradas de la capa 0 ya fueron incializados
 		for j := 0; j < r.NeuronasPorCapa[i]; j++ { // j es el nº identificativo de neurona en esa capa
 			for z, neurona := range neuronas[i-1] { // z es el nº identificativo de neurona de la capa anterior y neurona es la neurona anterior
@@ -88,4 +91,42 @@ func (r *RedNeuronal) ObtenerSalida() []float64 {
 		res = append(res, val.Salida)
 	}
 	return res
+}
+
+// Modificación de los pesos de la red siguiendo la siguiente formula:
+// W(i,j,k) = CAprendizaje * Salida(i,k-1) * δ(j,k) = CAprendizaje * Entrada(j,k) * δ(j,k)
+// Siendo W(Salida, Entrada, Capa)
+// Se debe haber modificado las salidas previemente en la propagación
+
+func (r *RedNeuronal) Retropropagar() {
+	for k := len(neuronas) - 1; k >= 0; k-- { // k es el nº de capa. Recorres las capas de la última a la primera
+		for j := range neuronas[k] { // j es el nº idenrificativo dentro de la neurona dentro de la capa k
+			// Actualizamos los sigma de la neurona actual
+			r.actualizarSigma(k, j)
+			for i := range neuronas[k][j].Pesos { // i es la neurona de entrada de la conexión w
+				// Modificación del peso
+				if i == 0 { //Estamos modificando el peso de la conexión con el bias
+					neuronas[k][j].Pesos[i] += r.CAprendizaje * neuronas[k][j].Sigma
+				} else { //Estamos modifcando el peso de la conexión con otra nerurona
+					neuronas[k][j].Pesos[i] += r.CAprendizaje * neuronas[k][j].Entradas[i] * neuronas[k][j].Sigma
+				}
+			}
+
+		}
+	}
+}
+
+// Actualiza el sigma de la neurona que se encuentra en la capa k, posición j
+func (r *RedNeuronal) actualizarSigma(k, j int) {
+	if k == len(neuronas)-1 { // Para la última capa
+		// Modificación del sigma
+		neuronas[k][j].Sigma = (r.SalidasDeseadas[j] - neuronas[k][j].Salida) * neuronas[k][j].Salida * (1 - neuronas[k][j].Salida)
+	} else {
+		var sumatorio float64          // ∑ (w(k+1,j,q) * δ(k+1,q)) siendo k la capa, j la neurona de salida y q la neurona de entrada
+		for q := range neuronas[k+1] { // q es el nº identificativo de neurona de la capa k+1
+			sumatorio += neuronas[k+1][q].Pesos[j] * neuronas[k+1][q].Sigma
+		}
+		// Modificación del sigma
+		neuronas[k][j].Sigma = sumatorio * neuronas[k][j].Salida * (1 - neuronas[k][j].Salida)
+	}
 }
