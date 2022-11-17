@@ -10,8 +10,12 @@ type RedNeuronal struct {
 	// [nº de capa][nº de neurona de dicha capa][cada conexión de dicha neurona]
 	// Pesos debe tener length de [len(numeroCapas)] [numeroCapas[i]] [numeroCapas[i-1]]
 	Pesos [][][]float64
+	// Coeficiente de aprendizaje de la red neuronal
+	CAprendizaje float64
 }
 
+// Neuronas del perceptron. La estructura es la siguiente:
+// [nº de capa][nº identificativo de la neurona en dicha capa]
 var neuronas [][]*Neurona
 
 // Perceptrones de la red. Su estructura es la siguiente:
@@ -54,8 +58,8 @@ func (r *RedNeuronal) inicializarEntradasPrimeraCapa() {
 }
 
 // Propaga los resultados a las neuronas transladando a las entradas de cada capa las salidas de la capa anterior .
+// Actualizando también la propiedad salida de cada neurona
 // A la primera capa simplemente le asigna las entradas pasadas a la neurona.
-// La salida de la última capa no se ve afectada
 func (r *RedNeuronal) Propagar() {
 
 	r.inicializarEntradasPrimeraCapa()
@@ -68,15 +72,20 @@ func (r *RedNeuronal) Propagar() {
 		}
 	}
 
+	// Actualiza los valores de la última capa
+	for _, neurona := range neuronas[len(neuronas)-1] {
+		neurona.CalcularSalida()
+	}
+
 }
 
 // Devuelve un vector con el calculo de la salida de cada neurona
-// de la última capa. Y actualiza sus valores.-
+// de la última capa.
 func (r *RedNeuronal) ObtenerSalida() []float64 {
 	indiceUltimaCapa := len(r.NeuronasPorCapa) - 1
 	var res []float64
 	for _, val := range neuronas[indiceUltimaCapa] {
-		res = append(res, val.CalcularSalida())
+		res = append(res, val.Salida)
 	}
 	return res
 }

@@ -34,3 +34,9 @@ func (p *Neurona) caclularNeta() float64 {
 	}
 	return res
 }
+
+// Calcular δ  de la neurona. Tiene que haber sido actualizada la salida previamente
+func (n *Neurona) GetSigma(deseada float64) float64 {
+	sigma := (deseada - n.Salida) * n.Salida * (1 - n.Salida)
+	return sigma
+}
