@@ -130,3 +130,11 @@ func (r *RedNeuronal) actualizarSigma(k, j int) {
 		neuronas[k][j].Sigma = sumatorio * neuronas[k][j].Salida * (1 - neuronas[k][j].Salida)
 	}
 }
+
+// Entrena la red con n iteraciones
+func (r *RedNeuronal) Entrenar(n int) {
+	for i := 0; i < n; i++ {
+		r.Propagar()
+		r.Retropropagar()
+	}
+}

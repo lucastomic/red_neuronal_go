@@ -46,10 +46,12 @@ func main() {
 	}
 	red.InitPerceptrones()
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 50000; i++ {
 		red.Propagar()
 		fmt.Println(red.ObtenerSalida())
 		red.Retropropagar()
 	}
+	// red.Entrenar(1000)
 
+	// fmt.Println(red.ObtenerSalida())
 }
