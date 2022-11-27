@@ -11,6 +11,8 @@ type Neurona struct {
 	Pesos []float64
 	// Sigma de la neurona
 	Sigma float64
+	// Diferencial de W que se aplicará respectivamente a cada peso
+	DiferencialW []float64
 }
 
 // Calcula la salída de la neurona aplicando la función de activación
