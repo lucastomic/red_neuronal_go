@@ -44,9 +44,9 @@ func main() {
 		CAprendizaje:    0.178136822069064,
 		SalidasDeseadas: []float64{0.608886775095016},
 	}
-	red.InitPerceptron()
+	red.InitPerceptrones()
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10000; i++ {
 		red.Propagar()
 		fmt.Println(red.ObtenerSalida())
 		red.Retropropagar()
